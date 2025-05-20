@@ -1,8 +1,27 @@
+import fs from 'fs';
 import fetch from "node-fetch";
 import yts from 'yt-search';
 import axios from "axios";
 
 const formatosAudio = ['mp3', 'm4a', 'webm', 'acc', 'flac', 'opus', 'ogg', 'wav'];
+const DB_PATH = './src/database/db_audios.json';  // ajusta según tu estructura
+
+// Funciones para manejar la DB JSON
+function leerDB() {
+  try {
+    if (!fs.existsSync(DB_PATH)) {
+      fs.writeFileSync(DB_PATH, '{}');
+    }
+    const data = fs.readFileSync(DB_PATH, 'utf-8');
+    return JSON.parse(data || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function escribirDB(db) {
+  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+}
 
 const ddownr = {
   descargar: async (url, formato) => {
@@ -37,7 +56,6 @@ const ddownr = {
       }
     } catch (error) {
       console.error('Error al intentar obtener el audio desde la primera API:', error);
-      // Si la primera API falla, se intenta con la API de respaldo
       return await ddownr.obtenerAudioDeRespaldo(url);
     }
   },
@@ -83,6 +101,41 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       return conn.reply(m.chat, `Ingresa el nombre de la música que deseas descargar.`, m);
     }
 
+    // Leer DB
+    let db = leerDB();
+
+    // Buscar en DB cache por texto exacto (puedes mejorar con otros métodos)
+    if (db[text]) {
+      const info = db[text];
+      const mensajeTexto = `🎵 *${info.title || 'Título desconocido'}*\n` +
+        `👁️‍🗨️ ${info.views || '0'} vistas\n` +
+        `🕒 ${info.ago || 'Fecha desconocida'}\n` +
+        `🔗 ${info.url || ''}\n\n` +
+        `_Audio enviado por Dj Huevito_`;
+
+      // Descargar miniatura
+      let thumbBuffer = null;
+      try {
+        if (info.thumbnail) {
+          const response = await fetch(info.thumbnail);
+          thumbBuffer = await response.arrayBuffer();
+        }
+      } catch { }
+
+      if (thumbBuffer) {
+        await conn.sendMessage(m.chat, {
+          image: Buffer.from(thumbBuffer),
+          caption: mensajeTexto
+        }, { quoted: m });
+      } else {
+        await conn.sendMessage(m.chat, { text: mensajeTexto }, { quoted: m });
+      }
+
+      await conn.sendMessage(m.chat, { audio: { url: info.downloadUrl }, mimetype: "audio/mpeg" }, { quoted: m });
+      return;
+    }
+
+
     const search = await yts(text);
     if (!search.all || search.all.length === 0) {
       return m.reply('No se encontraron resultados para tu búsqueda.');
@@ -90,15 +143,15 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const videoInfo = search.all[0];
     const { title, thumbnail, timestamp, views, ago, url } = videoInfo;
-    const vistas = formatoVistas(views);
+
     const infoMessage = `> 𝙴𝙽𝚅𝙸𝙰𝙽𝙳𝙾 𝙿𝙴𝙳𝙸𝙳𝙾.`;
     const thumb = (await conn.getFile(thumbnail))?.data;
 
     const JT = {
       contextInfo: {
         externalAdReply: {
-          title: botname,
-          body: wm,
+          title: title,
+          body: `${views} vistas • ${ago}`,
           mediaType: 1,
           previewType: 0,
           mediaUrl: url,
@@ -115,12 +168,24 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
       const downloadInfo = await ddownr.descargar(url, 'mp3');
       const downloadUrl = downloadInfo.downloadUrl;
 
+      // Guardar en DB
+      db[text] = {
+        downloadUrl,
+        title,
+        thumbnail,
+        timestamp,
+        views,
+        ago,
+        url
+      };
+      escribirDB(db);
+
       await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: "audio/mpeg" }, { quoted: m });
     } else {
       throw "Comando no reconocido.";
     }
   } catch (error) {
-    return m.reply(`⚠︎ Ocurrió un error: ${error.message}`);
+    return m.reply(`⚠ Ocurrió un error: ${error.message}`);
   }
 };
 
@@ -128,11 +193,3 @@ handler.command = handler.help = ['play'];
 handler.tags = ['downloader'];
 
 export default handler;
-
-function formatoVistas(views) {
-  if (views >= 1000) {
-    return (views / 1000).toFixed(1) + 'k (' + views.toLocaleString() + ')';
-  } else {
-    return views.toString();
-  }
-}

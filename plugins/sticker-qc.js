@@ -2,11 +2,19 @@ import { sticker } from '../lib/sticker.js';
 import axios from 'axios';
 
 const handler = async (m, { conn, args, usedPrefix, command }) => {
-  const who = m.sender; // Definimos al autor del mensaje
+  let target = m.sender; // Por defecto, el autor del mensaje
+
+  // Si hay un usuario etiquetado, usarlo como el autor ficticio
+  if (m.mentionedJid && m.mentionedJid.length > 0) {
+    target = m.mentionedJid[0];
+  }
+
+  // Eliminar menciones del texto
+  let cleanArgs = args.filter(a => !a.startsWith('@'));
   let text;
 
-  if (args.length >= 1) {
-    text = args.join(" ");
+  if (cleanArgs.length > 0) {
+    text = cleanArgs.join(" ");
   } else if (m.quoted && m.quoted.text) {
     text = m.quoted.text;
   } else {
@@ -16,8 +24,8 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
   if (text.length > 40)
     return conn.reply(m.chat, '🚩 El texto no puede tener más de 40 caracteres', m);
 
-  const pp = await conn.profilePictureUrl(who).catch(() => 'https://telegra.ph/file/24fa902ead26340f3df2c.png');
-  const nombre = await conn.getName(who);
+  const pp = await conn.profilePictureUrl(target).catch(() => 'https://telegra.ph/file/24fa902ead26340f3df2c.png');
+  const nombre = await conn.getName(target);
 
   const fkontak = {
     key: {
@@ -29,7 +37,7 @@ const handler = async (m, { conn, args, usedPrefix, command }) => {
     message: {
       contactMessage: {
         displayName: nombre,
-        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${nombre}\nFN:${nombre}\nTEL;type=CELL;type=VOICE;waid=${who.split('@')[0]}:${who.split('@')[0]}\nEND:VCARD`
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${nombre}\nFN:${nombre}\nTEL;type=CELL;type=VOICE;waid=${target.split('@')[0]}:${target.split('@')[0]}\nEND:VCARD`
       }
     }
   };

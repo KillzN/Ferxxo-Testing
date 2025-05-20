@@ -15,14 +15,14 @@ let handler = async (m, { conn, isRowner }) => {
   const groupsIn = chats.filter(([id]) => id.endsWith('@g.us'))
   const used = process.memoryUsage()
   let txt = ` 「 *Info Bot* 」\n`
-  txt += `「 *🏳️ Creador ∙* 」KILLBOT\n`
+  txt += `「 *🏳️ Creador ∙* 」FERXXOBOT\n`
   txt += `「 *👥 Grupos Unidos ∙* 」 ${groupsIn.length}\n`
   txt += `「 *👤 Chats Privados ∙* 」 ${chats.length - groupsIn.length}\n`
   txt += `「 *💬 Total De Chats ∙* 」 ${chats.length}\n`
   txt += `「 *🏴 Usuarios Registrados ∙* 」 ${totalreg}\n`
   txt += `「 *💫 Grupos Registrados ∙* 」 ${totalchats}\n`
   txt += `「 *🕜 Uptime ∙* 」 ${muptime}\n`
-  txt += `「 *🚩 Contacto ∙* 」 wa.me/56983073328`
+  txt += `「 *🚩 Contacto ∙* 」 wa.me/5493812410831`
   await conn.sendFile(m.chat, pp, 'thumbnail.jpg', txt, m)
 }
 handler.help = ['status']

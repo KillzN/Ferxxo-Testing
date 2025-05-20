@@ -1,7 +1,7 @@
 import Starlights from '@StarlightsTeam/Scraper'
 
 let handler = async (m, { conn, usedPrefix, command, text }) => {
-  if (!text) return conn.reply(m.chat, '🚩 Ingresa el nombre de usuario de TikTok que deseas buscar.\n\n`Ejemplo:`\n' + `> *${usedPrefix + command}* KILLBOT`, m)
+  if (!text) return conn.reply(m.chat, '🚩 Ingresa el nombre de usuario de TikTok que deseas buscar.\n\n`Ejemplo:`\n' + `> *${usedPrefix + command}* FERXXOBOT`, m)
   await m.react('🕓')
   try {
     let data = await Starlights.tiktokuser(text)

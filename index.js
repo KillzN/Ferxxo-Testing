@@ -8,7 +8,7 @@ import cfonts from 'cfonts'
 import { createInterface } from 'readline'
 import yargs from 'yargs'
 import chalk from 'chalk'
-console.log('\n✰ Iniciando KILLBOT ✰')
+console.log('\n✰ Iniciando FERXXOBOT ✰')
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const require = createRequire(__dirname)
 const { name, description, collaborators, author, version } = require(join(__dirname, './package.json'))
@@ -24,7 +24,7 @@ for (const key in collaborators) {
     }
 }
 activeCollaborators = activeCollaborators.slice(0, -2);
-cfonts.say('KILLBOT\nBOT', {
+cfonts.say('FERXXO\nBOT', {
     align: 'center',
     gradient: ['red', 'blue']
 })
@@ -34,7 +34,7 @@ cfonts.say(description, {
     gradient: ['blue', 'magenta']
 })
 const message = `${subtitleStyle('Desarrollado por »')} ${responseStyle(author.name)}
-${subtitleStyle('Código basado por »')} ${responseStyle('KILLBOT')}
+${subtitleStyle('Código basado por »')} ${responseStyle('FERXXOBOT')}
 ${subtitleStyle('Colaboradores activos »')} ${responseStyle(activeCollaborators)}
 ${subtitleStyle('Versión »')} ${responseStyle(version)}`
 console.log(boxen(message, { padding: 1, margin: 1, borderStyle: 'double', borderColor: 'blue', float: 'center', }))
@@ -82,4 +82,4 @@ process.on('warning', (warning) => {
         console.warn(warning.stack)
     }
 })
-start('KILLBOT.js')
+start('FERXXOBOT.js')

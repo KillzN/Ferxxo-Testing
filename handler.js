@@ -511,15 +511,15 @@ export async function deleteUpdate(message) {
 
 global.dfail = (type, m, conn) => {
     const msg = {
-        rowner: `🚩 Hola, este comando solo puede ser utilizado por *KILLBOT*.`,
-        owner: `👤 Usuario, Este Comando Solo Puede Ser Utilizado Por *KILLBOT*.`,
-        mods: `🤚🏻 Hola, este comando solo puede ser utilizado por *KILLBOT*.`,
+        rowner: `🚩 Hola, este comando solo puede ser utilizado por *FERXXOBOT*.`,
+        owner: `👤 Usuario, Este Comando Solo Puede Ser Utilizado Por *FERXXOBOT*.`,
+        mods: `🤚🏻 Hola, este comando solo puede ser utilizado por *FERXXOBOT*.`,
         premium: `😂 Lo siento, este comando es exclusivo para *Usuarios Premium*.`,
         group: `💫 Este comando solo funciona dentro de *Grupos*.`,
         private: `⚕️ Este comando solo se puede usar en el *Chat Privado* conmigo.`,
         admin: `⭐ Este comando solo está disponible para *Administradores del Grupo*.`,
         botAdmin: `🚩 Necesito ser *Administrador* para poder ejecutar este comando.`,
-        unreg: `🤚🏻 Debes estar *Registrado* para usar este comando.\n\nUsa: */reg nombre.edad*\nEjemplo: /reg KILLBOT.20`,
+        unreg: `🤚🏻 Debes estar *Registrado* para usar este comando.\n\nUsa: */reg nombre.edad*\nEjemplo: /reg FERXXOBOT.20`,
         restrict: `⚠️ Esta función está *Restringida* por el propietario del bot.*`
     }[type];
     if (msg) return conn.reply(m.chat, msg, m,).then(_ => m.react('✖️'))
